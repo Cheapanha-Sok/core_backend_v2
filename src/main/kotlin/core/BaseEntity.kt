@@ -14,7 +14,7 @@ import java.time.LocalDateTime
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener::class)
-data class BaseEntity(
+open class BaseEntity(
 
     @JsonIgnore
     @CreatedBy
@@ -39,5 +39,4 @@ data class BaseEntity(
     var updatedAt: LocalDateTime? = LocalDateTime.now(),
 
     var status: Boolean? = true
-
 )
