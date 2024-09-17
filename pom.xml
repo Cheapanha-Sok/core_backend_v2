@@ -15,6 +15,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <junit.version>5.10.0</junit.version>
         <kotlin.version>1.8.22</kotlin.version>
+        <spring-vesion>3.3.3</spring-vesion>
         <core_owner>Cheapanha-Sok</core_owner>
         <core-repo>core_backend_v2</core-repo>
         <core-url>https://maven.pkg.github.com</core-url>
@@ -28,21 +29,41 @@
     </distributionManagement>
 
     <dependencies>
+        <!--spring start-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>3.3.3</version>
+            <version>${spring-vesion}</version>
+
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
-            <version>3.3.3</version>
+            <version>${spring-vesion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <version>${spring-vesion}</version>
+        </dependency>
+
+        <!--kotlin-->
+        <dependency>
+            <groupId>com.fasterxml.jackson.module</groupId>
+            <artifactId>jackson-module-kotlin</artifactId>
+            <version>2.15.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jetbrains.kotlin</groupId>
+            <artifactId>kotlin-reflect</artifactId>
+            <version>${kotlin.version}</version>
         </dependency>
         <dependency>
             <groupId>org.jetbrains.kotlin</groupId>
             <artifactId>kotlin-stdlib-jdk8</artifactId>
             <version>${kotlin.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
