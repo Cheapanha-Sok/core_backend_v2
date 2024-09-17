@@ -10,5 +10,4 @@ data class ResponseDTO(
     var error: Any? = null,
     var timestamp: LocalDateTime? = LocalDateTime.now(),
     var total: Long? = 0L,
-    var responseType: Any? = null
 )
