@@ -1,4 +1,4 @@
-package utilities.annotaion
+package com.panha.core_backend.utilities.annotaion
 
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory

@@ -1,4 +1,4 @@
-package core
+package com.panha.core_backend.core
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import jakarta.persistence.Column

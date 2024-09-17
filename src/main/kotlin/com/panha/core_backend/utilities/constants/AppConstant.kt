@@ -1,4 +1,4 @@
-package utilities.constants
+package com.panha.core_backend.utilities.constants
 
 object AppConstant {
     const val ALL_PATH = "/all"

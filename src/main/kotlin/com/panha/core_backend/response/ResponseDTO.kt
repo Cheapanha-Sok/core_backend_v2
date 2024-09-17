@@ -1,4 +1,4 @@
-package response
+package com.panha.core_backend.response
 
 import java.time.LocalDateTime
 
