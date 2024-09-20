@@ -7,7 +7,6 @@ interface ResponseFormat {
     companion object {
         private val DefaultHttpStatus: HttpStatus = HttpStatus.OK
     }
-
     fun respondCustomStatus(
         data: Any, status: HttpStatus? = DefaultHttpStatus, message: String? = null
     ): ResponseDTO
