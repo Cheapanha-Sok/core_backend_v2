@@ -19,7 +19,7 @@ open class BaseEntity(
     @JsonIgnore
     @CreatedBy
     @Column(name = "created_by", updatable = false)
-    open var createdBy: Int? = 0,
+    open var createdBy: Long? = 0L,
 
     @JsonIgnore
     @CreatedDate
@@ -29,7 +29,7 @@ open class BaseEntity(
     @JsonIgnore
     @LastModifiedBy
     @Column(name = "last_modified_by")
-    open var updatedby: Int? = 0,
+    open var updatedby: Long? = 0L,
 
     @JsonIgnore
     @LastModifiedDate

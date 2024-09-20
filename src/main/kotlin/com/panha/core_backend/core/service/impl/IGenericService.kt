@@ -16,9 +16,7 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
 
     override fun update(entity: T, id: Long): T {
         val existingEntity = this.findById(id)
-        val updatedEntity =
-            utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
-        repository.save(updatedEntity as T)
+        utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
         return existingEntity
     }
 
