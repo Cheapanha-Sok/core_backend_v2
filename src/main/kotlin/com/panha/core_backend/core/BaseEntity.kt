@@ -9,7 +9,6 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedBy
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.jpa.domain.support.AuditingEntityListener
-import org.springframework.lang.Nullable
 import java.time.LocalDateTime
 
 
@@ -19,7 +18,6 @@ open class BaseEntity(
 
     @JsonIgnore
     @CreatedBy
-    @Nullable
     @Column(name = "created_by", updatable = false)
     open var createdBy: Int? = 0,
 

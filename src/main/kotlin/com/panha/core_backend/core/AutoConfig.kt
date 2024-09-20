@@ -4,5 +4,5 @@ import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-@ComponentScan(basePackages = ["com.panha.core_backend"])
+@ComponentScan(basePackages = ["com.panha"])
 open class AutoConfig

@@ -2,16 +2,18 @@ package com.panha.core_backend.core.service.impl
 
 import com.panha.core_backend.core.BaseEntity
 import com.panha.core_backend.core.exception.NotFoundExceptionCustom
-import com.panha.core_backend.core.repo.ExtendRepository
+import com.panha.core_backend.core.repo.BaseRepository
 import com.panha.core_backend.core.service.GenericService
 import com.panha.core_backend.utilities.UtilService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.lang.Nullable
 import org.springframework.stereotype.Service
 
 @Service
-class IGenericService<T : BaseEntity>(
-    private val repository : ExtendRepository<T>,
-    private val utilService: UtilService
-) : GenericService<T> {
+class IGenericService<T : BaseEntity>: GenericService<T> {
+
+    @Nullable @Autowired lateinit var repository: BaseRepository<T>
+    @Autowired lateinit var utilService: UtilService
 
     override fun save(entity: T): T {
         return repository.save(entity)
