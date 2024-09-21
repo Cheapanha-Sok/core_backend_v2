@@ -5,7 +5,11 @@ import com.panha.core_backend.core.exception.NotFoundExceptionCustom
 import com.panha.core_backend.core.repo.BaseRepository
 import com.panha.core_backend.core.service.GenericService
 import com.panha.core_backend.utilities.UtilService
+import jakarta.persistence.criteria.Predicate
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 
 abstract class IGenericService<T : BaseEntity>: GenericService<T> {
     @Autowired lateinit var repository: BaseRepository<T>
@@ -14,7 +18,29 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
         return repository.save(entity)
     }
 
-    override fun update(entity: T, id: Long): T {
+    override fun list(allParams: Map<String, String>): Page<T> {
+        val page = allParams["page"]?.toInt() ?:0
+        val size = allParams["size"]?.toInt() ?:10
+
+        return repository.findAll(
+            {root , _ , cb ->
+                val predicates = ArrayList<Predicate>()
+                predicates.add(cb.isTrue(root.get("status")))
+                cb.and(*predicates.toTypedArray())
+            },
+            PageRequest.of(page, size, Sort.by(Sort.Direction.DESC , "id"))
+        )
+    }
+
+    override fun detail(id: Long): T {
+        return this.findById(id)
+    }
+
+    override fun all() : List<T> {
+        return repository.findAll()
+    }
+
+    override fun update(id: Long , entity: T): T {
         val existingEntity = this.findById(id)
         utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
         return existingEntity
@@ -26,7 +52,7 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
         return existingEntity
     }
 
-    override fun softDelete(id: Long): T {
+    override fun softDelete(id: Long , status : Boolean): T {
         val existingEntity = this.findById(id)
         existingEntity.status = false
         return existingEntity
@@ -34,9 +60,10 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
 
     private fun findById(id: Long): T {
         return repository.findById(id)
-            .orElseThrow { NotFoundExceptionCustom("${this.entityClass.name} with id $id not found") }
+            .orElseThrow { NotFoundExceptionCustom("${this.getClassName()} with id $id not found") }
     }
 
-    private val entityClass: Class<T>
-        get() = repository::class.java.simpleName as Class<T>
+    private fun getClassName() : String {
+        return repository::class.java.simpleName
+    }
 }
