@@ -33,6 +33,6 @@ class JsonFormat(private val utilService: UtilService) : ResponseFormat {
     }
 
     override fun <T : Any> responsePage(data: Page<T>?, status: HttpStatus?, message: String?): ResponseDTO {
-        return ResponseDTO(code = status?.value(), message = message, data = data, total = data?.totalPages?.toLong())
+        return ResponseDTO(code = status?.value(), message = message, data = data?.content, total = data?.totalElements)
     }
 }

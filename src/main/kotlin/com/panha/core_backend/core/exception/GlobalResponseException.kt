@@ -1,65 +1,95 @@
 package com.panha.core_backend.core.exception
 
 import com.panha.core_backend.response.ResponseDTO
-import org.springframework.core.Ordered
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.core.annotation.Order
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatusCode
+import org.springframework.http.ResponseEntity
+import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.http.converter.HttpMessageNotWritableException
+import org.springframework.web.bind.MethodArgumentNotValidException
+import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.context.request.WebRequest
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
 
-@Order(Ordered.LOWEST_PRECEDENCE)
-@RestControllerAdvice
-class GlobalResponseException {
+@Order(Integer.MIN_VALUE)
+@ControllerAdvice
+class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundExceptionCustom::class)
-    fun handleNotFoundHandler(ex : NotFoundExceptionCustom) :ResponseDTO{
-        val responseDTO = ResponseDTO()
-        responseDTO.message = ex.message
-        responseDTO.code = HttpStatus.NOT_FOUND.value()
-        responseDTO.error = HttpStatus.NOT_FOUND.name
-        return responseDTO
-    }
-
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception::class)
-    fun handleGenericHandler(ex: Exception): ResponseDTO {
-        val responseDTO = ResponseDTO()
-        responseDTO.message = ex.message
-        responseDTO.code = HttpStatus.INTERNAL_SERVER_ERROR.value()
-        responseDTO.error = HttpStatus.INTERNAL_SERVER_ERROR.name
-        return responseDTO
+    fun handleAllExceptions(ex: Exception, request: WebRequest): ResponseEntity<ResponseDTO> {
+        val message = ex.message ?: ex.cause?.message ?: ex.stackTraceToString()
+        val response = createResponse(HttpStatus.INTERNAL_SERVER_ERROR, message)
+        logger.error(message)
+        return ResponseEntity(response, HttpStatus.INTERNAL_SERVER_ERROR)
     }
 
-    @ResponseStatus(HttpStatus.ACCEPTED)
-    @ExceptionHandler(BadRequestExceptionCustom::class)
-    fun handleBadRequestHandler(ex : BadRequestExceptionCustom) :ResponseDTO{
-        val responseDTO = ResponseDTO()
-        responseDTO.message = ex.message
-        responseDTO.code = HttpStatus.BAD_REQUEST.value()
-        responseDTO.error = HttpStatus.BAD_REQUEST.name
-        return responseDTO
+    override fun handleMethodArgumentNotValid(
+        ex: MethodArgumentNotValidException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val errors = ex.bindingResult.fieldErrors.map { "${it.field}: ${it.defaultMessage}" } +
+                ex.bindingResult.globalErrors.map { "${it.objectName}: ${it.defaultMessage}" }
+
+        val response = createResponse(HttpStatus.valueOf(status.value()), errors)
+        logger.error(errors.toString())
+        return ResponseEntity(response, headers, status)
     }
 
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    @ExceptionHandler(BadCredentialsExceptionCustom::class)
-    fun handleBadCredentialHandler(ex : BadCredentialsExceptionCustom) :ResponseDTO{
-        val responseDTO = ResponseDTO()
-        responseDTO.message = ex.message
-        responseDTO.code = HttpStatus.UNAUTHORIZED.value()
-        responseDTO.error = HttpStatus.UNAUTHORIZED.name
-        return responseDTO
+    override fun handleHttpMessageNotReadable(
+        ex: HttpMessageNotReadableException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.cause?.message ?: "Unexpected Error: JSON parse"
+        val response = createResponse(HttpStatus.valueOf(status.value()), message)
+        logger.error(message)
+        return ResponseEntity(response, headers, status)
+    }
+
+    override fun handleHttpMessageNotWritable(
+        ex: HttpMessageNotWritableException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        request: WebRequest
+    ): ResponseEntity<Any> {
+        val message = ex.cause?.message ?: "Unexpected Error: JSON parse"
+        val response = createResponse(HttpStatus.valueOf(status.value()), message)
+        logger.error(message)
+        return ResponseEntity(response, headers, status)
+    }
+
+    @ExceptionHandler(NotFoundExceptionCustom::class)
+    fun handleEntityNotFounds(ex: NotFoundExceptionCustom?, request: WebRequest): ResponseEntity<ResponseDTO> {
+        val message = ex?.message ?: "Unexpected Error"
+        val response = createResponse(HttpStatus.NOT_FOUND, message)
+        logger.error(message)
+        return ResponseEntity(response, HttpStatus.NOT_FOUND)
     }
 
 
-    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
-    @ExceptionHandler(NullPointerException::class)
-    fun handleNullPointerHandler(ex : NullPointerException) :ResponseDTO{
-        val responseDTO = ResponseDTO()
-        responseDTO.message = "Some filed are null or incorrect!"
-        responseDTO.code = HttpStatus.BAD_REQUEST.value()
-        responseDTO.error = HttpStatus.BAD_REQUEST.name
-        return responseDTO
+    @ExceptionHandler(EntityNotFoundException::class)
+    fun handleEntityAcceptable(ex: EntityNotFoundException?, request: WebRequest): ResponseEntity<ResponseDTO> {
+        val message = ex?.message ?: "Unexpected Error"
+        val response = createResponse(HttpStatus.NOT_ACCEPTABLE, message)
+        logger.error(message)
+        return ResponseEntity(response, HttpStatus.NOT_ACCEPTABLE)
+    }
+
+    private fun createResponse(status: HttpStatus, message: Any): ResponseDTO {
+        return ResponseDTO(
+            code = status.value(),
+            message = status.reasonPhrase,
+            error = message,
+            data = null,
+            dataList = null,
+            total = null
+        )
     }
 }

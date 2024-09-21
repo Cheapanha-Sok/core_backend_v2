@@ -43,7 +43,7 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
     override fun update(id: Long , entity: T): T {
         val existingEntity = this.findById(id)
         utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
-        return existingEntity
+        return repository.save(existingEntity)
     }
 
     override fun delete(id: Long): T {
