@@ -12,11 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 
 abstract class IGenericService<T : BaseEntity>: GenericService<T> {
     @Autowired lateinit var repository: BaseRepository<T>
     @Autowired lateinit var utilService: UtilService
-    private val entityClass : Class<T>?=null
     override fun save(entity: T): T {
         return repository.save(entity)
     }
@@ -67,7 +68,20 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
 
     private fun findById(id: Long): T {
         return repository.findById(id)
-            .orElseThrow { NotFoundExceptionCustom("${entityClass?.simpleName} with id $id not found") }
+            .orElseThrow { NotFoundExceptionCustom("${this.getGenericTypeClass().simpleName} with id $id not found") }
+    }
+
+    private fun getGenericTypeClass(): Class<*> {
+        try {
+            val genericSuperclass: Type = this.javaClass.genericSuperclass
+            check(genericSuperclass is ParameterizedType) { "Class is not parametrized with generic type! Please use extends <>" }
+            val className: String = (genericSuperclass as ParameterizedType).actualTypeArguments[0].typeName
+            return Class.forName(className)
+        } catch (e: Exception) {
+            // Log detailed error
+            e.printStackTrace()
+            throw IllegalStateException("Unable to determine generic type class! Error: ${e.message}", e)
+        }
     }
 
 }
