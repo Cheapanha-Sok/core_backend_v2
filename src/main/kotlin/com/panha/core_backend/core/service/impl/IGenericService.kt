@@ -5,7 +5,9 @@ import com.panha.core_backend.core.exception.NotFoundExceptionCustom
 import com.panha.core_backend.core.repo.BaseRepository
 import com.panha.core_backend.core.service.GenericService
 import com.panha.core_backend.utilities.UtilService
+import jakarta.persistence.EntityNotFoundException
 import jakarta.persistence.criteria.Predicate
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Sort
 abstract class IGenericService<T : BaseEntity>: GenericService<T> {
     @Autowired lateinit var repository: BaseRepository<T>
     @Autowired lateinit var utilService: UtilService
+    private val entityClass : Class<T>?=null
     override fun save(entity: T): T {
         return repository.save(entity)
     }
@@ -42,8 +45,12 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
 
     override fun update(id: Long , entity: T): T {
         val existingEntity = this.findById(id)
-        utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
-        return repository.save(existingEntity)
+        try {
+            utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
+            return repository.save(existingEntity)
+        }catch (ex : ConstraintViolationException) {
+            throw EntityNotFoundException("Unexpected Error")
+        }
     }
 
     override fun delete(id: Long): T {
@@ -60,10 +67,7 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
 
     private fun findById(id: Long): T {
         return repository.findById(id)
-            .orElseThrow { NotFoundExceptionCustom("${this.getClassName()} with id $id not found") }
+            .orElseThrow { NotFoundExceptionCustom("${entityClass?.simpleName} with id $id not found") }
     }
 
-    private fun getClassName() : String {
-        return repository::class.java.simpleName
-    }
 }

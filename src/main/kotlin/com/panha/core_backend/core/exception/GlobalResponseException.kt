@@ -2,6 +2,7 @@ package com.panha.core_backend.core.exception
 
 import com.panha.core_backend.response.ResponseDTO
 import jakarta.persistence.EntityNotFoundException
+import org.hibernate.exception.ConstraintViolationException
 import org.springframework.core.annotation.Order
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -71,6 +72,13 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         val response = createResponse(HttpStatus.NOT_FOUND, message)
         logger.error(message)
         return ResponseEntity(response, HttpStatus.NOT_FOUND)
+    }
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolationException(ex: ConstraintViolationException?, request: WebRequest): ResponseEntity<ResponseDTO> {
+        val message = ex?.message ?: "Bad Request"
+        val response = createResponse(HttpStatus.BAD_REQUEST, message)
+        logger.error(message)
+        return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
 
 
