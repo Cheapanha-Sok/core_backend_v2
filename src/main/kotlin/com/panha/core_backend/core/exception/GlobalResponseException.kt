@@ -80,8 +80,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         logger.error(message)
         return ResponseEntity(response, HttpStatus.BAD_REQUEST)
     }
-
-
     @ExceptionHandler(EntityNotFoundException::class)
     fun handleEntityAcceptable(ex: EntityNotFoundException?, request: WebRequest): ResponseEntity<ResponseDTO> {
         val message = ex?.message ?: "Unexpected Error"
@@ -89,7 +87,6 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         logger.error(message)
         return ResponseEntity(response, HttpStatus.NOT_ACCEPTABLE)
     }
-
     private fun createResponse(status: HttpStatus, message: Any): ResponseDTO {
         return ResponseDTO(
             code = status.value(),

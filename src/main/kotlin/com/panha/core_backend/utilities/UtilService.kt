@@ -7,6 +7,8 @@ import jakarta.persistence.criteria.Predicate
 import jakarta.persistence.criteria.Root
 import org.springframework.beans.BeanUtils
 import org.springframework.stereotype.Component
+import java.lang.reflect.ParameterizedType
+import java.lang.reflect.Type
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*

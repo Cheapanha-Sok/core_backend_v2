@@ -15,24 +15,26 @@ import org.springframework.data.domain.Sort
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
-abstract class IGenericService<T : BaseEntity>: GenericService<T> {
-    @Autowired lateinit var repository: BaseRepository<T>
-    @Autowired lateinit var utilService: UtilService
+abstract class IGenericService<T : BaseEntity> : GenericService<T> {
+    @Autowired
+    lateinit var repository: BaseRepository<T>
+    @Autowired
+    lateinit var utilService: UtilService
     override fun save(entity: T): T {
         return repository.save(entity)
     }
 
     override fun list(allParams: Map<String, String>): Page<T> {
-        val page = allParams["page"]?.toInt() ?:0
-        val size = allParams["size"]?.toInt() ?:10
+        val page = allParams["page"]?.toInt() ?: 0
+        val size = allParams["size"]?.toInt() ?: 10
 
         return repository.findAll(
-            {root , _ , cb ->
+            { root, _, cb ->
                 val predicates = ArrayList<Predicate>()
                 predicates.add(cb.isTrue(root.get("status")))
                 cb.and(*predicates.toTypedArray())
             },
-            PageRequest.of(page, size, Sort.by(Sort.Direction.DESC , "id"))
+            PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "id"))
         )
     }
 
@@ -40,18 +42,14 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
         return this.findById(id)
     }
 
-    override fun all() : List<T> {
+    override fun all(): List<T> {
         return repository.findAll()
     }
 
-    override fun update(id: Long , entity: T): T {
+    override fun update(id: Long, entity: T): T {
         val existingEntity = this.findById(id)
-        try {
-            utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
-            return repository.save(existingEntity)
-        }catch (ex : ConstraintViolationException) {
-            throw EntityNotFoundException("Unexpected Error")
-        }
+        utilService.bindProperties(entity, existingEntity, exclude = listOf("id", "created", "createdBy"))
+        return repository.save(existingEntity)
     }
 
     override fun delete(id: Long): T {
@@ -60,7 +58,7 @@ abstract class IGenericService<T : BaseEntity>: GenericService<T> {
         return existingEntity
     }
 
-    override fun softDelete(id: Long , status : Boolean): T {
+    override fun softDelete(id: Long, status: Boolean): T {
         val existingEntity = this.findById(id)
         existingEntity.status = false
         return existingEntity
