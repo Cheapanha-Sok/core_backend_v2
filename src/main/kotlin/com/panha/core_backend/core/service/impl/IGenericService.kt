@@ -5,9 +5,7 @@ import com.panha.core_backend.core.exception.NotFoundExceptionCustom
 import com.panha.core_backend.core.repo.BaseRepository
 import com.panha.core_backend.core.service.GenericService
 import com.panha.core_backend.utilities.UtilService
-import jakarta.persistence.EntityNotFoundException
 import jakarta.persistence.criteria.Predicate
-import org.hibernate.exception.ConstraintViolationException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
@@ -16,10 +14,8 @@ import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
 
 abstract class IGenericService<T : BaseEntity> : GenericService<T> {
-    @Autowired
-    lateinit var repository: BaseRepository<T>
-    @Autowired
-    lateinit var utilService: UtilService
+    @Autowired lateinit var repository: BaseRepository<T>
+    @Autowired lateinit var utilService: UtilService
     override fun save(entity: T): T {
         return repository.save(entity)
     }

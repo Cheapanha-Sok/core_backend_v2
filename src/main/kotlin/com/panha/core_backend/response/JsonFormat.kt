@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Component
 
 @Component
-class JsonFormat(private val utilService: UtilService) : ResponseFormat {
+abstract class JsonFormat(private val utilService: UtilService) : ResponseFormat() {
 
     override fun respondCustomStatus(data: Any, status: HttpStatus?, message: String?): ResponseDTO {
         return ResponseDTO(code = status?.value(), message = message, data = data)

@@ -1,8 +1,6 @@
 package com.panha.core_backend.core.controllers
 
 import com.panha.core_backend.core.BaseEntity
-import com.panha.core_backend.core.exception.BadRequestExceptionCustom
-import com.panha.core_backend.core.exception.NotAcceptableException
 import com.panha.core_backend.core.exception.NotFoundExceptionCustom
 import com.panha.core_backend.core.repo.BaseRepository
 import com.panha.core_backend.response.JsonFormat
@@ -10,7 +8,6 @@ import com.panha.core_backend.response.ResponseDTO
 import com.panha.core_backend.utilities.UtilService
 import jakarta.persistence.EntityNotFoundException
 import jakarta.persistence.criteria.Predicate
-import jakarta.servlet.http.HttpServletRequest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
